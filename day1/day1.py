@@ -1,30 +1,28 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 
 
 @dataclass
-class ElfItems:
-    calories: List[int]
+class Elf:
+    items: List[int] = field(default_factory=list)
 
     @property
     def total_calories(self) -> int:
-        return sum(self.calories)
+        return sum(self.items)
 
 
-def get_elf_calories(filename: str) -> List[ElfItems]:
+def get_elf_calories(filename: str) -> List[Elf]:
     """Get each set of items per elf"""
     output = []
     with open(filename) as fp:
-        calories: List[int] = []
+        elf = Elf()
         for val in fp.read().splitlines():
             try:
                 val = int(val)
-                calories.append(val)
+                elf.items.append(val)
             except ValueError:
-                elf = ElfItems(calories=calories)
+                elf = Elf()
                 output.append(elf)
-                calories = []
-        elf = ElfItems(calories=calories)
         output.append(elf)
     return output
 
