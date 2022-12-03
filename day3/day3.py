@@ -1,20 +1,30 @@
 from dataclasses import dataclass
-from functools import cached_property
+from functools import cache, cached_property
 from string import ascii_letters
 from typing import List
+
+from more_itertools import grouper
 
 Item = str
 
 
-@dataclass
+@dataclass(frozen=True)
 class Rucksack:
-    first: List[Item]
-    second: List[Item]
+    """Elf Rucksack containing items"""
 
-    @classmethod
-    def from_items(cls, items: str) -> "Rucksack":
-        half_len = int(len(items) / 2)
-        return cls(first=items[0:half_len], second=items[half_len:])
+    items: List[Item]
+
+    @property
+    def half_len(self) -> int:
+        return len(self.items) // 2
+
+    @cached_property
+    def first(self) -> List[Item]:
+        return self.items[0 : self.half_len]
+
+    @cached_property
+    def second(self) -> List[Item]:
+        return self.items[self.half_len :]
 
     @cached_property
     def common_item(self) -> Item:
@@ -23,13 +33,17 @@ class Rucksack:
 
     @cached_property
     def common_item_val(self) -> str:
-        return self._letter_val(self.common_item)
-
-    def _letter_val(self, letter: str) -> int:
-        return ascii_letters.find(letter) + 1
+        return letter_score(self.common_item)
 
 
 Rucksacks = List[Rucksack]
+Group = List[Rucksacks]
+
+
+@cache
+def letter_score(letter: str) -> int:
+    """Calculate score based on index in ascii letters"""
+    return ascii_letters.find(letter) + 1
 
 
 def get_rucksack_from_file(filename: str) -> List[Rucksack]:
@@ -37,9 +51,21 @@ def get_rucksack_from_file(filename: str) -> List[Rucksack]:
     output = []
     with open(filename) as fp:
         for line in fp.read().splitlines():
-            rucksack = Rucksack.from_items(items=list(line))
+            rucksack = Rucksack(items=list(line))
             output.append(rucksack)
     return output
+
+
+def make_elf_groups(rucksacks: Rucksacks, group_size: int = 3) -> Group:
+    return list(grouper(rucksacks, n=group_size))
+
+
+def calculate_group_badge_val(group: Group) -> int:
+    """Calculate badge between 3 group elves"""
+    x, y, z = group
+    common = set(x.items) & set(y.items) & set(z.items)
+    letter = list(common)[0]
+    return letter_score(letter)
 
 
 def main():
@@ -49,6 +75,8 @@ def main():
     rucksacks = get_rucksack_from_file(filename)
     total = sum(r.common_item_val for r in rucksacks)
     print(f"total for part one common item values: {total}")
+    total2 = sum(calculate_group_badge_val(g) for g in make_elf_groups(rucksacks))
+    print(f"total for part two sum of group badges: {total2}")
 
 
 if __name__ == "__main__":
