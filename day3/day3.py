@@ -32,12 +32,13 @@ class Rucksack:
         return list(common)[0]
 
     @cached_property
-    def common_item_val(self) -> str:
+    def common_item_val(self) -> int:
         return letter_score(self.common_item)
 
 
 Rucksacks = List[Rucksack]
-Group = List[Rucksacks]
+Group = Rucksacks
+Groups = List[Rucksacks]
 
 
 @cache
@@ -56,7 +57,7 @@ def get_rucksack_from_file(filename: str) -> List[Rucksack]:
     return output
 
 
-def make_elf_groups(rucksacks: Rucksacks, group_size: int = 3) -> Group:
+def make_elf_groups(rucksacks: Rucksacks, group_size: int = 3) -> Groups:
     return list(grouper(rucksacks, n=group_size))
 
 

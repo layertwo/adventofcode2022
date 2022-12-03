@@ -18,8 +18,8 @@ def get_elf_calories(filename: str) -> List[Elf]:
         elf = Elf()
         for val in fp.read().splitlines():
             try:
-                val = int(val)
-                elf.items.append(val)
+                num = int(val)
+                elf.items.append(num)
             except ValueError:
                 elf = Elf()
                 output.append(elf)

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import IntEnum
 from functools import cache
-from typing import Dict, List, Set
+from typing import Dict, List, Tuple
 
 
 class Shape(IntEnum):
@@ -115,9 +115,11 @@ class Game:
 
 
 Games = List[Game]
+ValueSet = Tuple[str, str]
+Values = List[ValueSet]
 
 
-def get_games_from_file(filename: str) -> List[Set]:
+def get_games_from_file(filename: str) -> Values:
     """Read values from file and convert to tuple"""
     output = []
     with open(filename) as fp:
@@ -128,7 +130,7 @@ def get_games_from_file(filename: str) -> List[Set]:
     return output
 
 
-def load_games_part_1(game_data: List[Set[str]]) -> Games:
+def load_games_part_1(game_data: Values) -> Games:
     """Read game data and use values to define Game object"""
     games = []
     for data in game_data:
@@ -137,7 +139,7 @@ def load_games_part_1(game_data: List[Set[str]]) -> Games:
     return games
 
 
-def load_games_part_2(game_data: List[Set[str]]) -> Games:
+def load_games_part_2(game_data: Values) -> Games:
     """Read game data and use values to define Game object"""
     games = []
     for data in game_data:
