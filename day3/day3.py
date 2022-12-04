@@ -3,8 +3,6 @@ from functools import cache, cached_property
 from string import ascii_letters
 from typing import List
 
-from more_itertools import grouper
-
 Item = str
 
 
@@ -14,31 +12,36 @@ class Rucksack:
 
     items: List[Item]
 
-    @property
+    @cached_property
     def half_len(self) -> int:
+        """Calculate the half length of a rucksack"""
         return len(self.items) // 2
 
     @cached_property
     def first(self) -> List[Item]:
+        """Return items in the first pocket"""
         return self.items[0 : self.half_len]
 
     @cached_property
     def second(self) -> List[Item]:
+        """Return items in the second pocket"""
         return self.items[self.half_len :]
 
     @cached_property
     def common_item(self) -> Item:
+        """Find the common item between both pockets"""
         common = set(self.first) & set(self.second)
         return list(common)[0]
 
     @cached_property
     def common_item_val(self) -> int:
+        """Find the score for the common item"""
         return letter_score(self.common_item)
 
 
 Rucksacks = List[Rucksack]
 Group = Rucksacks
-Groups = List[Rucksacks]
+Groups = List[Group]
 
 
 @cache
@@ -58,7 +61,9 @@ def get_rucksack_from_file(filename: str) -> List[Rucksack]:
 
 
 def make_elf_groups(rucksacks: Rucksacks, group_size: int = 3) -> Groups:
-    return list(grouper(rucksacks, n=group_size))
+    """Group rucksacks by group_size"""
+    args = [iter(rucksacks)] * group_size
+    return list(zip(*args))  # type: ignore
 
 
 def calculate_group_badge_val(group: Group) -> int:
